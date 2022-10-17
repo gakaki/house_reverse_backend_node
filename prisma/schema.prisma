@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  slug      String?    
+  title     String
+  content   String
+  comments  Comment[]
+  author   User?      @relation(fields: [authorId], references: [id])
+  authorId String?    @db.ObjectId
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Comments contain a comment string and connect back to the post.
+// postId must have @db.ObjectId to match up with Post's id type
+model Comment {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  String @db.ObjectId
+  comment String
+}
+
+
+
+model User {
+  id     Int @default(autoincrement()) @id
+  first_name  String
+  last_name  String
+  email  String
+  mobile Int
+  location String
+  //  employees @relation(fields: [employeeId], references: [id])
+}
+
+model Hotel {
+  id          Int @default(autoincrement()) @id
+  name        String
+  location    String
+  employees   Employee[]
+  rooms       Room[]
+}
+
+model Employee {
+  id     Int @default(autoincrement()) @id
+  first_name  String
+  user_name String
+  password String
+  last_name  String
+  email  String
+  mobile Int
+  location String
+  hotel    Hotel   @relation(fields: [hotel_id], references: [id])
+  hotel_id Int
+}
+
+model Room {
+  id       Int @default(autoincrement()) @id
+
+  capacity Int
+  prize    Float
+  facilities String
+
+  hotel    Hotel   @relation(fields: [hotel_id], references: [id])
+  hotel_id Int
+}
+
+model RoomType {
+
+  @@map("room_type")
+
+  id       Int @default(autoincrement()) @id
+
+  prize    Int
+  capacity Int
+  wifi Boolean
+  AC Boolean
+  heater Boolean
+  rating Int
+  other_facilities String
+}
+
+
+model RoomTypeRooms {
+
+  @@map("room_type_rooms")
+
+  id       Int @default(autoincrement()) @id
+
+  prize    Int
+  capacity Int
+  wifi Boolean
+  AC Boolean
+  heater Boolean
+  rating Int
+  other_facilities String
+}
+
+
+model Reversation {
+  id      Int @default(autoincrement()) @id
+  hotel_id Int
+  room_id  Int
+  guest_list varchar
+  check_in  DateTime
+  check_out DateTime
+  balance_amount Float
+}
+
+
+model Transaction {
+  id      Int @default(autoincrement()) @id
+  amount  Float
+}
+
+model Payment {
+  reversation_id  Int
+  transaction_id  Int
+}
